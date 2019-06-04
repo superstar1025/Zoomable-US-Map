@@ -180,7 +180,7 @@ function mainMapDraw(us, cityData, data) {
 
 function citiesMark(d) {
     $('.city-marked').css("display", "none");
-    $('.county-boundary').css("fill", "#aaa");
+    // $('.county-boundary').css("fill", "#aaa");
     d3.csv(SPECIFIC_STATE_INFO).then((cityData) => {
 
         var getCity = window.lodash.filter(cityData, function (o) {
@@ -204,8 +204,8 @@ function citiesMark(d) {
             })
             .style("fill", function (d) {
                 // color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
-                // color = '#000';
-                color = colorRange(d.ZipScore);
+                color = '#000';
+                // color = colorRange(d.ZipScore);
                 return color;
             })
             .style("opacity", 1.0)
@@ -407,16 +407,14 @@ function reset() {
     active = d3.select(null);
     $('.city-marked').css("display", "none");
 
-
-
     g.transition()
         .delay(100)
         .duration(550)
         .style("stroke-width", "1.5px")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-    setTimeout(function () {
-        mainMapDraw(usMapData, cityData, usCountiesData);
-        walMartMark();
-    }, 700)
+    // setTimeout(function () {
+    //     mainMapDraw(usMapData, cityData, usCountiesData);
+    //     walMartMark();
+    // }, 800)
 }
