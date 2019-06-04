@@ -62,8 +62,9 @@ var g = svg.append("g")
     .attr('height', height + margin.top + margin.bottom)
 
 $('.import-btn').click(function (e) {
-    if (e.target.name === 'Default') {
-        stateInfo = SPECIFIC_STATE_INFO;
+    if (e.target.name === 'NoData') {
+        // stateInfo = SPECIFIC_STATE_INFO;
+        stateInfo = './assets/georgia' + e.target.name + '.csv';
     } else {
         stateInfo = './assets/georgia' + e.target.name + '.csv';
     }
@@ -80,7 +81,9 @@ function ready(us, stateInfo) {
                 usCountiesData = data;
                 cityData = citydata;
                 mainMapDraw(us, cityData, usCountiesData);
-                walMartMark();
+                if (cityData.length != 0) {
+                    walMartMark();
+                }
             });
         });
 }
@@ -94,6 +97,9 @@ function mainMapDraw(us, cityData, data) {
         .attr("d", path)
         .attr("class", "county-boundary")
         .style("fill", function (d) {
+            if (cityData.length == 0) {
+                return '#002F45';
+            }
             var getCounty = window.lodash.filter(data, function (o) {
                 return o.id == d.id;
             });
@@ -104,13 +110,14 @@ function mainMapDraw(us, cityData, data) {
                         return o.id == getCounty[0].id;
                     });
                     // color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
-                    color = colorRange(getCountyScore[0] == undefined ? 0 : getCountyScore[0].CountyScore);
+                    color = colorRange(getCountyScore[0] == undefined ? "#002F45" : getCountyScore[0].CountyScore);
                 } else {
                     color = "#002F45";
                 }
             } else if (getCounty[0] && getCounty[0].state == undefined) {
                 color = "#fec122";
             }
+            // console.log(color)
             return color;
         })
         .on("click", clicked)
@@ -415,7 +422,7 @@ function reset() {
         .style("stroke-width", "1.5px")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-        walMartMark();
+        // walMartMark();
 
     // setTimeout(function () {
     //     mainMapDraw(usMapData, cityData, usCountiesData);
