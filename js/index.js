@@ -418,5 +418,5 @@ function reset() {
     setTimeout(function () {
         mainMapDraw(usMapData, cityData, usCountiesData);
         walMartMark();
-    }, 650)
+    }, 700)
 }
