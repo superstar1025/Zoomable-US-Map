@@ -81,7 +81,7 @@ function ready(us, stateInfo) {
                 usCountiesData = data;
                 cityData = citydata;
                 mainMapDraw(us, cityData, usCountiesData);
-                if (cityData.length != 0) {
+                if (cityData.length == 0) {
                     walMartMark();
                 }
             });
@@ -220,6 +220,7 @@ function citiesMark(d) {
             .style("display", "block")
             // .style("stroke", "#aaa")
             .style("stroke-width", 0.1)
+            .on("click", reset)
             .on("mouseover", function (d) {
                 var html = "";
                 html += "<div class=\"tooltip_kv\">";
@@ -407,7 +408,10 @@ function clicked(d) {
         .style("fill", "#000")
         .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
 
-    citiesMark(d);
+
+    if (cityData.length != 0) {
+        citiesMark(d);
+    }
 
 }
 
