@@ -263,11 +263,11 @@ function walMartMark() {
         {
             long: -84.945630,
             lat: 34.479210
-        }, 
+        },
         {
             long: -84.730390,
             lat: 33.935610
-        }, 
+        },
         {
             long: -84.415916,
             lat: 33.752935
@@ -407,12 +407,16 @@ function reset() {
     active = d3.select(null);
     $('.city-marked').css("display", "none");
 
-    mainMapDraw(usMapData, cityData, usCountiesData);
-    walMartMark();
+
 
     g.transition()
         .delay(100)
         .duration(550)
         .style("stroke-width", "1.5px")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+    setTimeout(function () {
+        mainMapDraw(usMapData, cityData, usCountiesData);
+        walMartMark();
+    }, 650)
 }
