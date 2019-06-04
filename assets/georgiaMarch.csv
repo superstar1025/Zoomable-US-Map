@@ -1,4 +1,4 @@
-,Zipcode,Score,City,County,Lat,Long,State,ZipScore,CountyScore,id
+,ZipCode,Score,City,County,Lat,Long,State,ZipScore,CountyScore,id
 0,30002,2,Avondale Estates,DeKalb County,33.77,-84.26,Georgia,19,374,13089
 1,30002,2,Avondale Estates,DeKalb County,33.77,-84.26,Georgia,19,374,13089
 2,30002,2,Avondale Estates,DeKalb County,33.77,-84.26,Georgia,19,374,13089

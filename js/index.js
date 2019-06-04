@@ -3,7 +3,7 @@
 // --- config --- //
 const TOPO_JSON = "./assets/us-counties.topojson";
 const US_COUNTIES = "./assets/us-counties.csv";
-const SPECIFIC_STATE_INFO = "./assets/georgia.csv";
+const SPECIFIC_STATE_INFO = "./assets/georgiaMarch.csv";
 const COLOR_1 = "#002f45";
 const COLOR_2 = "#12547a";
 const COLOR_3 = "#107dc2";
@@ -80,6 +80,7 @@ function ready(us, stateInfo) {
                 usCountiesData = data;
                 cityData = citydata;
                 mainMapDraw(us, cityData, usCountiesData);
+                walMartMark();
             });
         });
 }
@@ -251,8 +252,42 @@ function citiesMark(d) {
                 $(this).attr("fill-opacity", "1.0");
                 $("#tooltip-container").hide();
             });
+
+
         $('.city-marked-' + d.id).css("display", "block");
     });
+}
+
+function walMartMark() {
+    var marks = [
+        {
+            long: -84.945630,
+            lat: 34.479210
+        }, 
+        {
+            long: -84.730390,
+            lat: 33.935610
+        }, 
+        {
+            long: -84.415916,
+            lat: 33.752935
+        }
+    ];
+    g.append("g")
+        .attr("id", "walmart")
+        .selectAll(".mark")
+        .data(marks)
+        .enter()
+        .append("image")
+        .attr('class', 'mark')
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr("xlink:href", 'https://static.wixstatic.com/media/20c715_dc20b5f240f149678f72c5c7710b817a~mv2.png')
+        .attr("transform", function (d) {
+            console.log('mark ==++>', d)
+            return "translate(" + projection([d.long, d.lat]) + ")";
+        });
+
 }
 
 function cityMark() {
@@ -372,9 +407,10 @@ function reset() {
     active.classed("active", false);
     active = d3.select(null);
     $('.city-marked').css("display", "none");
-    
+
     mainMapDraw(usMapData, cityData, usCountiesData);
-    
+    walMartMark();
+
     g.transition()
         .delay(100)
         .duration(550)
