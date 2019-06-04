@@ -284,7 +284,6 @@ function walMartMark() {
         .attr('height', 10)
         .attr("xlink:href", 'https://static.wixstatic.com/media/20c715_dc20b5f240f149678f72c5c7710b817a~mv2.png')
         .attr("transform", function (d) {
-            console.log('mark ==++>', d)
             return "translate(" + projection([d.long, d.lat]) + ")";
         });
 
