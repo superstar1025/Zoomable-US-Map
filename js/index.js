@@ -80,7 +80,7 @@ function ready(us, stateInfo) {
                 usCountiesData = data;
                 cityData = citydata;
                 mainMapDraw(us, cityData, usCountiesData);
-                // walMartMark();
+                walMartMark();
             });
         });
 }
@@ -414,6 +414,8 @@ function reset() {
         .duration(550)
         .style("stroke-width", "1.5px")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+        walMartMark();
 
     // setTimeout(function () {
     //     mainMapDraw(usMapData, cityData, usCountiesData);
