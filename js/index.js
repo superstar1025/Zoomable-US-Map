@@ -203,8 +203,9 @@ function citiesMark(d) {
                 return Math.sqrt(d.ZipScore * 0.01) * 0.5;
             })
             .style("fill", function (d) {
-                // color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
-                color = '#000';
+                color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
+                // color = '#000';
+                // color = '#aaa';
                 // color = colorRange(d.ZipScore);
                 return color;
             })
@@ -280,8 +281,8 @@ function walMartMark() {
         .enter()
         .append("image")
         .attr('class', 'mark')
-        .attr('width', 10)
-        .attr('height', 10)
+        .attr('width', 3)
+        .attr('height', 3)
         .attr("xlink:href", 'https://static.wixstatic.com/media/20c715_dc20b5f240f149678f72c5c7710b817a~mv2.png')
         .attr("transform", function (d) {
             return "translate(" + projection([d.long, d.lat]) + ")";
