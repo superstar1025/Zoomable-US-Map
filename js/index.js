@@ -16,6 +16,8 @@ const COLOR_9 = "#f27446";
 const COLOR_10 = "#f05d5d";
 // ---   end  --- //
 
+var stateInfo = SPECIFIC_STATE_INFO;
+
 var margin = {
     top: 10,
     bottom: 10,
@@ -43,7 +45,7 @@ var usMapData = null;
 Promise.resolve(d3.json(TOPO_JSON))
     .then((us) => {
         usMapData = us;
-        ready(us);
+        ready(us, stateInfo);
     });
 
 var projection = d3.geoAlbersUsa()
@@ -59,110 +61,125 @@ var g = svg.append("g")
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
 
-function ready(us) {
+$('.import-btn').click(function (e) {
+    if (e.target.name === 'Default') {
+        stateInfo = SPECIFIC_STATE_INFO;
+    } else {
+        stateInfo = './assets/georgia' + e.target.name + '.csv';
+    }
+    ready(usMapData, stateInfo);
+})
+
+var usCountiesData = null;
+var cityData = null;
+
+function ready(us, stateInfo) {
     d3.csv(US_COUNTIES)
-        .then((mapData) => {
-            d3.csv(SPECIFIC_STATE_INFO).then((cityData) => {
-                var data = mapData;
-                g.append("g")
-                    .attr("id", "counties")
-                    .selectAll("path")
-                    .data(topojson.feature(us, us.objects.counties).features)
-                    .enter().append("path")
-                    .attr("d", path)
-                    .attr("class", "county-boundary")
-                    .style("fill", function (d) {
-                        var getCounty = window.lodash.filter(data, function (o) {
-                            return o.id == d.id;
-                        });
-                        var color = "#002F45";
-                        if (getCounty[0] && getCounty[0].state !== undefined) {
-                            if (getCounty[0].state === "Georgia") {
-                                var getCountyScore = window.lodash.filter(cityData, function (o) {
-                                    return o.id == getCounty[0].id;
-                                });
-                                // color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
-                                color = colorRange(getCountyScore[0].CountyScore);
-                            } else {
-                                color = "#002F45";
-                            }
-                        } else if (getCounty[0] && getCounty[0].state == undefined) {
-                            color = "#fec122";
-                        }
-                        return color;
-                    })
-                    .on("click", clicked)
-                    .on("mousemove", function (d) {
-
-                        var getCity = window.lodash.filter(data, function (o) {
-                            return o.id == d.id;
-                        });
-                        var getGeorgiaCountyScore = window.lodash.filter(cityData, function (o) {
-                            return o.id == d.id;
-                        });
-
-                        var html = "";
-                        html += "<div class=\"tooltip_kv\">";
-                        html += "<span class=\"tooltip_key\">";
-                        html += "State: " + getCity[0].state;
-                        html += "<br/>";
-                        html += "County: " + getCity[0].county;
-                        if (getGeorgiaCountyScore[0] !== undefined) {
-                            html += "<br/>";
-                            html += "CountyScore: " + getGeorgiaCountyScore[0].CountyScore;
-                        }
-                        html += "</span>";
-                        html += "<span class=\"tooltip_value\">";
-                        html += "";
-                        html += "</span>";
-                        html += "</div>";
-
-                        $("#tooltip-container").html(html);
-                        $(this).attr("fill-opacity", "1.0");
-                        $("#tooltip-container").show();
-
-                        var coordinates = d3.mouse(this);
-
-                        var map_width = $('.viz-svg')[0].getBoundingClientRect().width;
-                        if (d3.event.layerX < map_width / 2) {
-                            d3.select("#tooltip-container")
-                                .style("top", (d3.event.layerY + 15) + "px")
-                                .style("left", (d3.event.layerX + 15) + "px");
-                        } else {
-                            var tooltip_width = $("#tooltip-container").width();
-                            d3.select("#tooltip-container")
-                                .style("top", (d3.event.layerY + 15) + "px")
-                                .style("left", (d3.event.layerX - tooltip_width - 30) + "px");
-                        }
-                    })
-                    .on("mouseout", function () {
-                        $(this).attr("fill-opacity", "1.0");
-                        $("#tooltip-container").hide();
-                    });
-
-                g.append("g")
-                    .attr("id", "states")
-                    .selectAll("path")
-                    .data(topojson.feature(us, us.objects.states).features)
-                    .enter().append("path")
-                    .attr("d", path)
-                    .attr("class", "state")
-                    .attr("fill", "none")
-                    .on("click", clicked)
-
-                g.append("path")
-                    .datum(topojson.mesh(us, us.objects.states, function (a, b) { return a !== b; }))
-                    .attr("id", "state-borders")
-                    .attr("d", path);
+        .then((data) => {
+            d3.csv(stateInfo).then((citydata) => {
+                usCountiesData = data;
+                cityData = citydata;
+                mainMapDraw(us, cityData, usCountiesData);
             });
         });
+}
+
+function mainMapDraw(us, cityData, data) {
+    g.append("g")
+        .attr("id", "counties")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.counties).features)
+        .enter().append("path")
+        .attr("d", path)
+        .attr("class", "county-boundary")
+        .style("fill", function (d) {
+            var getCounty = window.lodash.filter(data, function (o) {
+                return o.id == d.id;
+            });
+            var color = "#002F45";
+            if (getCounty[0] && getCounty[0].state !== undefined) {
+                if (getCounty[0].state === "Georgia") {
+                    var getCountyScore = window.lodash.filter(cityData, function (o) {
+                        return o.id == getCounty[0].id;
+                    });
+                    // color = '#' + Math.floor(Math.random() * Math.pow(2, 32) ^ 0xffffff).toString(16).substr(-6);
+                    color = colorRange(getCountyScore[0] == undefined ? 0 : getCountyScore[0].CountyScore);
+                } else {
+                    color = "#002F45";
+                }
+            } else if (getCounty[0] && getCounty[0].state == undefined) {
+                color = "#fec122";
+            }
+            return color;
+        })
+        .on("click", clicked)
+        .on("mousemove", function (d) {
+
+            var getCity = window.lodash.filter(data, function (o) {
+                return o.id == d.id;
+            });
+            var getGeorgiaCountyScore = window.lodash.filter(cityData, function (o) {
+                return o.id == d.id;
+            });
+
+            var html = "";
+            html += "<div class=\"tooltip_kv\">";
+            html += "<span class=\"tooltip_key\">";
+            html += "State: " + getCity[0].state;
+            html += "<br/>";
+            html += "County: " + getCity[0].county;
+            if (getGeorgiaCountyScore[0] !== undefined) {
+                html += "<br/>";
+                html += "CountyScore: " + getGeorgiaCountyScore[0].CountyScore;
+            }
+            html += "</span>";
+            html += "<span class=\"tooltip_value\">";
+            html += "";
+            html += "</span>";
+            html += "</div>";
+
+            $("#tooltip-container").html(html);
+            $(this).attr("fill-opacity", "1.0");
+            $("#tooltip-container").show();
+
+            var coordinates = d3.mouse(this);
+
+            var map_width = $('.viz-svg')[0].getBoundingClientRect().width;
+            if (d3.event.layerX < map_width / 2) {
+                d3.select("#tooltip-container")
+                    .style("top", (d3.event.layerY + 15) + "px")
+                    .style("left", (d3.event.layerX + 15) + "px");
+            } else {
+                var tooltip_width = $("#tooltip-container").width();
+                d3.select("#tooltip-container")
+                    .style("top", (d3.event.layerY + 15) + "px")
+                    .style("left", (d3.event.layerX - tooltip_width - 30) + "px");
+            }
+        })
+        .on("mouseout", function () {
+            $(this).attr("fill-opacity", "1.0");
+            $("#tooltip-container").hide();
+        });
+
+    g.append("g")
+        .attr("id", "states")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter().append("path")
+        .attr("d", path)
+        .attr("class", "state")
+        .attr("fill", "none")
+        .on("click", clicked)
+
+    g.append("path")
+        .datum(topojson.mesh(us, us.objects.states, function (a, b) { return a !== b; }))
+        .attr("id", "state-borders")
+        .attr("d", path);
 }
 
 function citiesMark(d) {
     $('.city-marked').css("display", "none");
     $('.county-boundary').css("fill", "#aaa");
-    // $('#county-boundary').addClass('county-watermark');
-    // $('.state').css("stroke", "#000");
     d3.csv(SPECIFIC_STATE_INFO).then((cityData) => {
 
         var getCity = window.lodash.filter(cityData, function (o) {
@@ -190,7 +207,7 @@ function citiesMark(d) {
                 color = colorRange(d.ZipScore);
                 return color;
             })
-            .style("opacity", 1)
+            .style("opacity", 1.0)
             .style("display", "block")
             .style("stroke", "transparent")
             .on("mouseover", function (d) {
@@ -275,33 +292,33 @@ function cityMark() {
 
 function colorRange(score) {
     var color = "#fff";
-    if (0 < score && score <= 10) {
+    if (0 < score && score <= 60) {
         color = COLOR_1;
-    } else if (10 < score && score <= 20) {
+    } else if (60 < score && score <= 120) {
         color = COLOR_2;
     }
-    else if (20 < score && score <= 30) {
+    else if (120 < score && score <= 180) {
         color = COLOR_3;
     }
-    else if (30 < score && score <= 40) {
+    else if (180 < score && score <= 240) {
         color = COLOR_4;
     }
-    else if (40 < score && score <= 50) {
+    else if (240 < score && score <= 300) {
         color = COLOR_5;
     }
-    else if (50 < score && score <= 60) {
+    else if (300 < score && score <= 360) {
         color = COLOR_6;
     }
-    else if (60 < score && score <= 70) {
+    else if (360 < score && score <= 420) {
         color = COLOR_7;
     }
-    else if (70 < score && score <= 80) {
+    else if (420 < score && score <= 480) {
         color = COLOR_8;
     }
-    else if (80 < score && score <= 90) {
+    else if (480 < score && score <= 540) {
         color = COLOR_9;
     }
-    else if (90 < score && score <= 100) {
+    else if (540 < score && score <= 600) {
         color = COLOR_10;
     }
 
@@ -355,12 +372,12 @@ function reset() {
     active.classed("active", false);
     active = d3.select(null);
     $('.city-marked').css("display", "none");
-
+    
+    mainMapDraw(usMapData, cityData, usCountiesData);
+    
     g.transition()
         .delay(100)
-        .duration(750)
+        .duration(550)
         .style("stroke-width", "1.5px")
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    ready(usMapData);
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 }
