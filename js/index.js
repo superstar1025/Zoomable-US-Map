@@ -80,7 +80,7 @@ function ready(us, stateInfo) {
                 usCountiesData = data;
                 cityData = citydata;
                 mainMapDraw(us, cityData, usCountiesData);
-                walMartMark();
+                // walMartMark();
             });
         });
 }
@@ -211,7 +211,8 @@ function citiesMark(d) {
             })
             .style("opacity", 1.0)
             .style("display", "block")
-            .style("stroke", "transparent")
+            // .style("stroke", "#aaa")
+            .style("stroke-width", 0.1)
             .on("mouseover", function (d) {
                 var html = "";
                 html += "<div class=\"tooltip_kv\">";
