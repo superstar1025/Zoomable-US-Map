@@ -61,9 +61,14 @@ var g = svg.append("g")
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
 
+var legend_obj = svg.append("g")
+.attr('class', 'legend')
+.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+.attr('width', 200)
+.attr('height', 50)
+
 $('.import-btn').click(function (e) {
     if (e.target.name === 'NoData') {
-        // stateInfo = SPECIFIC_STATE_INFO;
         stateInfo = './assets/georgia' + e.target.name + '.csv';
     } else {
         stateInfo = './assets/georgia' + e.target.name + '.csv';
@@ -84,6 +89,7 @@ function ready(us, stateInfo) {
                 if (cityData.length == 0) {
                     walMartMark();
                 }
+                legend();
             });
         });
 }
@@ -268,6 +274,51 @@ function citiesMark(d) {
     });
 }
 
+function legend() {
+    var x = d3.scaleLinear()
+        .domain([1, 10])
+        .rangeRound([width - 245, width - 50]);
+    var color = d3.scaleThreshold()
+        .domain(d3.range(1, 12))
+        .range([COLOR_1, COLOR_2, COLOR_3, COLOR_4, COLOR_5, COLOR_6, COLOR_7, COLOR_8, COLOR_9, COLOR_10, "red"]);
+
+    var rangeScore = [1, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600];
+    legend_obj.append("g")
+        .attr("id", "legend")
+        .attr("class", "legend")
+        .selectAll("rect")
+        .data(color.range().map(function (d) {
+            d = color.invertExtent(d);
+            if (d[0] == null) d[0] = x.domain()[0];
+            if (d[1] == null) d[1] = x.domain()[1];
+            return d;
+        }))
+        .enter().append("rect")
+        .attr("height", 8)
+        .attr("x", function (d) { return x(d[0]); })
+        .attr("width", function (d) { return x(d[1]) - x(d[0]); })
+        .attr("fill", function (d) { return color(d[0]); });
+
+    // Legend title - "color reange by score"
+    legend_obj.append("text")
+        .attr("class", "caption")
+        .attr("x", x.range()[0])
+        .attr("y", -5)
+        .attr("fill", "#000")
+        .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
+        .attr("font-size", "12px")
+        .text("legend by score");
+
+    legend_obj.call(d3.axisBottom(x)
+        .tickSize(13)
+        .tickFormat(function (x, i) { return i ? (x > 1 ? (x-1) * 60 : 1) : (x > 1 ? (x-1) * 60 : 1) + ""; })
+        .tickValues(color.domain()))
+        .attr("transform", "translate(0,70)")
+        .select(".domain")
+        .remove();
+}
+
 function walMartMark() {
     var marks = [
         {
@@ -426,7 +477,7 @@ function reset() {
         .style("stroke-width", "1.5px")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-        // walMartMark();
+    // walMartMark();
 
     // setTimeout(function () {
     //     mainMapDraw(usMapData, cityData, usCountiesData);
