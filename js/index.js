@@ -62,10 +62,10 @@ var g = svg.append("g")
     .attr('height', height + margin.top + margin.bottom)
 
 var legend_obj = svg.append("g")
-.attr('class', 'legend')
-.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-.attr('width', 200)
-.attr('height', 50)
+    .attr('class', 'legend')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    .attr('width', 200)
+    .attr('height', 50)
 
 $('.import-btn').click(function (e) {
     if (e.target.name === 'NoData') {
@@ -89,7 +89,8 @@ function ready(us, stateInfo) {
                 if (cityData.length == 0) {
                     walMartMark();
                 }
-                legend();
+                // legend();
+                legend1();
             });
         });
 }
@@ -274,7 +275,7 @@ function citiesMark(d) {
     });
 }
 
-function legend() {
+function legend_line() {
     var x = d3.scaleLinear()
         .domain([1, 10])
         .rangeRound([width - 245, width - 50]);
@@ -312,11 +313,42 @@ function legend() {
 
     legend_obj.call(d3.axisBottom(x)
         .tickSize(13)
-        .tickFormat(function (x, i) { return i ? (x > 1 ? (x-1) * 60 : 1) : (x > 1 ? (x-1) * 60 : 1) + ""; })
+        .tickFormat(function (x, i) { return i ? (x > 1 ? (x - 1) * 60 : 1) : (x > 1 ? (x - 1) * 60 : 1) + ""; })
         .tickValues(color.domain()))
         .attr("transform", "translate(0,70)")
         .select(".domain")
         .remove();
+}
+
+function legend() {
+    var legendText = ["1 - 60", "60 - 120", "120 - 180", "180 - 240", "240 - 300", "300 - 360", "360 - 420", "420 - 480", "480 - 540", "540 - 600"];
+    var color = d3.scaleLinear()
+        .range([COLOR_1, COLOR_2, COLOR_3, COLOR_4, COLOR_5, COLOR_6, COLOR_7, COLOR_8, COLOR_9, COLOR_10]);
+
+    color.domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+
+    var legend = d3.select("body").append("svg")
+        .attr("class", "legend")
+        .attr("width", 140)
+        .attr("height", 200)
+        .selectAll("g")
+        .data(color.domain().slice().reverse())
+        .enter()
+        .append("g")
+        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+    legend.append("rect")
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color);
+
+    legend.append("text")
+        .data(legendText.reverse())
+        .attr("x", 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .text(function (d) { return d; });
 }
 
 function walMartMark() {

@@ -100,8 +100,8 @@
 }
 
 /* Legend Position Style */
-/* .legend {
+.legend {
 	position:absolute;
-	left:800px;
-    top:500px;
-} */
+	right:20px;
+    top:100px;
+}
