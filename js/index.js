@@ -89,8 +89,7 @@ function ready(us, stateInfo) {
                 if (cityData.length == 0) {
                     walMartMark();
                 }
-                // legend();
-                legend1();
+                legend();
             });
         });
 }
